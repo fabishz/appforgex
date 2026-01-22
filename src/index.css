@@ -269,3 +269,39 @@
     box-shadow: 0 0 40px -5px hsl(var(--glow-primary) / 0.6);
   }
 }
+
+/* Training Portal Specific Utilities */
+.code-block {
+  @apply rounded-lg overflow-hidden;
+}
+
+.lesson-content h1,
+.lesson-content h2,
+.lesson-content h3 {
+  @apply font-bold tracking-tight;
+}
+
+.lesson-content p {
+  @apply leading-relaxed;
+}
+
+.lesson-content code:not(pre code) {
+  @apply px-1.5 py-0.5 rounded bg-primary/10 text-primary text-sm font-mono;
+}
+
+.achievement-badge {
+  @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
+  @apply bg-yellow-500/10 text-yellow-500 border border-yellow-500/20;
+}
+
+.skill-badge-beginner {
+  @apply bg-green-500/10 text-green-500 border-green-500/20;
+}
+
+.skill-badge-intermediate {
+  @apply bg-blue-500/10 text-blue-500 border-blue-500/20;
+}
+
+.skill-badge-advanced {
+  @apply bg-purple-500/10 text-purple-500 border-purple-500/20;
+}

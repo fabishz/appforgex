@@ -101,10 +101,16 @@ const Training = () => {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 animate-fade-in-up opacity-0 stagger-1">
               Launch Your <span className="gradient-text">Tech Career</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up opacity-0 stagger-2">
+            <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up opacity-0 stagger-2 mb-8">
               Industry-leading training programs designed to transform beginners into
               professionals and keep experts ahead of the curve.
             </p>
+            <Link to="/training-portal">
+              <Button size="lg" className="glow-effect hover:glow-effect-strong animate-fade-in-up opacity-0 stagger-3">
+                <ArrowRight className="mr-2 w-5 h-5" />
+                Enter Training Portal
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

@@ -14,6 +14,11 @@ import Technologies from "./pages/Technologies";
 import Contact from "./pages/Contact";
 import Careers from "./pages/Careers";
 import NotFound from "./pages/NotFound";
+// Training Portal Pages
+import TrainingPortal from "./pages/TrainingPortal";
+import CourseDetail from "./pages/CourseDetail";
+import LessonPage from "./pages/LessonPage";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +39,11 @@ const App = () => (
           <Route path="/technologies" element={<Technologies />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
+          {/* Training Portal Routes */}
+          <Route path="/training-portal" element={<TrainingPortal />} />
+          <Route path="/training-portal/course/:courseId" element={<CourseDetail />} />
+          <Route path="/training-portal/learn/:courseId/:moduleId/:lessonId" element={<LessonPage />} />
+          <Route path="/training-portal/profile" element={<UserProfile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
@@ -42,3 +52,4 @@ const App = () => (
 );
 
 export default App;
+

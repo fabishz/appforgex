@@ -878,6 +878,223 @@ async def predict(features: list[float]):
         createdAt: new Date('2024-06-01'),
         updatedAt: new Date('2024-12-15'),
     },
+    {
+        id: 'mobile-dev-react-native',
+        title: 'Mobile App Development with React Native',
+        shortDescription: 'Build cross-platform mobile apps for iOS and Android using React Native.',
+        fullDescription: 'Learn how to build high-performance, cross-platform mobile applications using React Native. This course covers core components, navigation, state management, and deploying to app stores.',
+        skillLevel: 'intermediate' as SkillLevel,
+        category: 'mobile-development',
+        thumbnail: '/courses/mobile-dev.jpg',
+        instructor: {
+            name: 'Alex Rivera',
+            title: 'Mobile Solutions Architect',
+        },
+        modules: [
+            {
+                id: 'rn-basics',
+                title: 'React Native Fundamentals',
+                description: 'Introduction to React Native and core components',
+                order: 1,
+                estimatedDuration: 200,
+                lessons: [
+                    {
+                        id: 'rn-intro',
+                        title: 'What is React Native?',
+                        type: 'theory',
+                        duration: 30,
+                        order: 1,
+                        content: {
+                            theory: {
+                                sections: [
+                                    {
+                                        heading: 'Introduction to React Native',
+                                        content: 'React Native is an open-source UI software framework created by Meta Platforms, Inc. It is used to develop applications for Android, Android TV, iOS, macOS, tvOS, Web, Windows and UWP by enabling developers to use the React framework along with native platform capabilities.',
+                                        codeExample: {
+                                            language: 'javascript',
+                                            code: `import React from 'react';
+import { Text, View } from 'react-native';
+
+const HelloWorldApp = () => {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Hello, world!</Text>
+    </View>
+  );
+}
+
+export default HelloWorldApp;`,
+                                            explanation: 'A basic React Native component using View and Text.',
+                                        },
+                                    },
+                                ],
+                                keyTakeaways: [
+                                    'React Native uses native components instead of web components',
+                                    'Write once, run on both iOS and Android',
+                                    'Uses the same React patterns you already know',
+                                ],
+                            },
+                        },
+                    },
+                ],
+            },
+        ],
+        prerequisites: ['react-intermediate'],
+        learningOutcomes: [
+            'Build cross-platform mobile apps',
+            'Use native device features',
+            'Implement complex mobile navigation',
+            'Deploy apps to App Store and Play Store',
+        ],
+        duration: 15,
+        rating: 4.8,
+        enrollmentCount: 5400,
+        certificateOffered: true,
+        tags: ['React Native', 'Mobile', 'iOS', 'Android', 'JavaScript'],
+        createdAt: new Date('2024-07-10'),
+        updatedAt: new Date('2024-12-20'),
+    },
+
+    {
+        id: 'cybersecurity-essentials',
+        title: 'Cybersecurity Essentials',
+        shortDescription: 'Learn the fundamentals of cybersecurity, network security, and threat protection.',
+        fullDescription: 'Protect systems and networks from digital attacks. This course covers the basics of cybersecurity, including common threats, encryption, and security best practices.',
+        skillLevel: 'beginner' as SkillLevel,
+        category: 'cybersecurity',
+        thumbnail: '/courses/cybersecurity.jpg',
+        instructor: {
+            name: 'Sarah Jenkins',
+            title: 'Security Consultant',
+        },
+        modules: [
+            {
+                id: 'security-intro',
+                title: 'Introduction to Security',
+                description: 'Core concepts of cybersecurity',
+                order: 1,
+                estimatedDuration: 180,
+                lessons: [
+                    {
+                        id: 'threat-landscape',
+                        title: 'The Modern Threat Landscape',
+                        type: 'theory',
+                        duration: 40,
+                        order: 1,
+                        content: {
+                            theory: {
+                                sections: [
+                                    {
+                                        heading: 'Common Cyber Threats',
+                                        content: 'Cyber threats are malicious acts that seek to damage data, steal data, or disrupt digital life in general. Common threats include malware, phishing, and man-in-the-middle attacks.',
+                                        codeExample: {
+                                            language: 'bash',
+                                            code: `# Example of a simple security check
+nmap -sV -p 1-65535 localhost`,
+                                            explanation: 'Using nmap to scan for open ports and services.',
+                                        },
+                                    },
+                                ],
+                                keyTakeaways: [
+                                    'Understand the CIA triad (Confidentiality, Integrity, Availability)',
+                                    'Identify common attack vectors',
+                                    'Learn basic defense mechanisms',
+                                ],
+                            },
+                        },
+                    },
+                ],
+            },
+        ],
+        prerequisites: [],
+        learningOutcomes: [
+            'Identify common security threats',
+            'Implement basic network security',
+            'Understand encryption principles',
+            'Apply security best practices',
+        ],
+        duration: 12,
+        rating: 4.7,
+        enrollmentCount: 4200,
+        certificateOffered: true,
+        tags: ['Security', 'Network', 'Cybersecurity', 'Beginner'],
+        createdAt: new Date('2024-08-05'),
+        updatedAt: new Date('2024-12-15'),
+    },
+    {
+        id: 'ui-ux-design-fundamentals',
+        title: 'UI/UX Design Fundamentals',
+        shortDescription: 'Master the principles of user interface and user experience design.',
+        fullDescription: 'Learn how to create beautiful, user-friendly interfaces. This course covers design principles, wireframing, prototyping, and user testing.',
+        skillLevel: 'beginner' as SkillLevel,
+        category: 'design',
+        thumbnail: '/courses/design-fundamentals.jpg',
+        instructor: {
+            name: 'Leo Varma',
+            title: 'Lead Product Designer',
+        },
+        modules: [
+            {
+                id: 'design-intro',
+                title: 'Introduction to Design Thinking',
+                description: 'The core process of modern design',
+                order: 1,
+                estimatedDuration: 150,
+                lessons: [
+                    {
+                        id: 'design-principles',
+                        title: 'Core Design Principles',
+                        type: 'theory',
+                        duration: 45,
+                        order: 1,
+                        content: {
+                            theory: {
+                                sections: [
+                                    {
+                                        heading: 'Visual Hierarchy',
+                                        content: 'Visual hierarchy is the arrangement or presentation of elements in a way that implies importance. In other words, visual hierarchy influences the order in which the human eye perceives what it sees.',
+                                        codeExample: {
+                                            language: 'css',
+                                            code: `.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.sub-text {
+  font-size: 1.125rem;
+  color: #4b5563;
+}`,
+                                            explanation: 'Using typography to establish visual hierarchy.',
+                                        },
+                                    },
+                                ],
+                                keyTakeaways: [
+                                    'Design is about solving problems',
+                                    'Consistency is key to a good user experience',
+                                    'Always design with the user in mind',
+                                ],
+                            },
+                        },
+                    },
+                ],
+            },
+        ],
+        prerequisites: [],
+        learningOutcomes: [
+            'Understand design thinking principles',
+            'Create effective wireframes and prototypes',
+            'Apply color theory and typography',
+            'Conduct basic user research',
+        ],
+        duration: 8,
+        rating: 4.9,
+        enrollmentCount: 3800,
+        certificateOffered: true,
+        tags: ['Design', 'UI', 'UX', 'Figma', 'Beginner'],
+        createdAt: new Date('2024-09-12'),
+        updatedAt: new Date('2024-12-10'),
+    },
 ];
 
 /**
