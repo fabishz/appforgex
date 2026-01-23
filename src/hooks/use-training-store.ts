@@ -8,6 +8,7 @@ import {
     Achievement,
     LearningStats,
 } from '@/types/training';
+import { getCourseById } from '@/data/course-data';
 
 interface TrainingStore {
     // User profile
@@ -216,23 +217,62 @@ export const useTrainingStore = create<TrainingStore>()(
 
                     // Update course progress
                     const updatedCourseProgress = [...state.userProfile.courseProgress];
+
+                    // Check for course completion
+                    const course = getCourseById(courseId);
+                    let isCourseCompleted = false;
+                    let certificateEarned = false;
+                    let newAchievements = [...state.userProfile.achievements];
+                    let newCompletedCourses = [...state.userProfile.completedCourses];
+
+                    if (course) {
+                        const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+                        const currentCompletedLessons = updatedModuleProgress.reduce(
+                            (sum, mod) => sum + mod.lessonProgress.filter((l) => l.completed).length,
+                            0
+                        );
+
+                        // If we just completed the last lesson
+                        if (currentCompletedLessons === totalLessons) {
+                            isCourseCompleted = true;
+                            if (!newCompletedCourses.includes(courseId)) {
+                                newCompletedCourses.push(courseId);
+                            }
+
+                            if (course.certificateOffered) {
+                                certificateEarned = true;
+                                // Add certificate achievement if not already there
+                                const hasCertificate = newAchievements.some(a => a.courseId === courseId && a.type === 'certificate');
+                                if (!hasCertificate) {
+                                    newAchievements.push({
+                                        id: `cert-${courseId}-${Date.now()}`,
+                                        type: 'certificate',
+                                        title: `${course.title} Certificate`,
+                                        description: `Completed ${course.title}`,
+                                        icon: 'award',
+                                        earnedAt: new Date(),
+                                        courseId: courseId
+                                    });
+                                }
+                            }
+                        }
+                    }
+
                     updatedCourseProgress[courseProgressIndex] = {
                         ...courseProgress,
                         moduleProgress: updatedModuleProgress,
                         lastAccessedAt: new Date(),
+                        overallProgress: course ? Math.round((updatedModuleProgress.reduce((sum, mod) => sum + mod.lessonProgress.filter(l => l.completed).length, 0) / course.modules.reduce((sum, m) => sum + m.lessons.length, 0)) * 100) : 0,
+                        certificateEarned: certificateEarned || courseProgress.certificateEarned,
+                        certificateEarnedAt: certificateEarned ? new Date() : courseProgress.certificateEarnedAt
                     };
-
-                    // Calculate overall progress (simple: completed lessons / total lessons)
-                    // In real implementation, get total lessons from course data
-                    const completedLessons = updatedModuleProgress.reduce(
-                        (sum, mod) => sum + mod.lessonProgress.filter((l) => l.completed).length,
-                        0
-                    );
 
                     return {
                         userProfile: {
                             ...state.userProfile,
                             courseProgress: updatedCourseProgress,
+                            completedCourses: newCompletedCourses,
+                            achievements: newAchievements,
                             totalLearningTime: state.userProfile.totalLearningTime + timeSpent,
                             lastActiveDate: new Date(),
                         },

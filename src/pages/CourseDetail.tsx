@@ -21,8 +21,11 @@ import {
     PlayCircle,
     ArrowRight,
     AlertCircle,
+    Download,
+    Trophy,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 const SKILL_LEVEL_COLORS = {
     beginner: 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -41,6 +44,7 @@ const LESSON_TYPE_ICONS = {
 const CourseDetail = () => {
     const { courseId } = useParams<{ courseId: string }>();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const { userProfile, enrollInCourse, getCourseProgress, startLesson } = useTrainingStore();
 
     if (!courseId) {
@@ -63,7 +67,9 @@ const CourseDetail = () => {
     }
 
     const isEnrolled = userProfile?.enrolledCourses.includes(course.id) || false;
+    const isCompleted = userProfile?.completedCourses.includes(course.id) || false;
     const courseProgress = getCourseProgress(course.id);
+    const certificateEarned = courseProgress?.certificateEarned || false;
     const prerequisiteCheck = userProfile
         ? meetsPrerequisites(course.id, userProfile)
         : { meets: true, missing: [] };
@@ -87,6 +93,13 @@ const CourseDetail = () => {
             startLesson(course.id, firstModule.id, firstLesson.id);
             navigate(`/training-portal/learn/${course.id}/${firstModule.id}/${firstLesson.id}`);
         }
+    };
+
+    const handleDownloadCertificate = () => {
+        toast({
+            title: "Certificate Downloaded",
+            description: `You have successfully downloaded your certificate for ${course.title}.`,
+        });
     };
 
     return (
@@ -143,9 +156,9 @@ const CourseDetail = () => {
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between mb-3">
                                             <span className="font-semibold">Your Progress</span>
-                                            <span className="text-lg font-bold">{progressPercentage}%</span>
+                                            <span className="text-lg font-bold">{isCompleted ? 100 : progressPercentage}%</span>
                                         </div>
-                                        <Progress value={progressPercentage} className="h-3 mb-2" />
+                                        <Progress value={isCompleted ? 100 : progressPercentage} className="h-3 mb-2" />
                                         <p className="text-sm text-muted-foreground">
                                             {completedLessons} of {totalLessons} lessons completed
                                         </p>
@@ -189,10 +202,26 @@ const CourseDetail = () => {
                                     </AlertDescription>
                                 </Alert>
                             ) : isEnrolled ? (
-                                <Button onClick={handleStartCourse} size="lg" className="w-full glow-effect">
-                                    {progressPercentage > 0 ? 'Continue Learning' : 'Start Course'}
-                                    <ArrowRight className="w-5 h-5 ml-2" />
-                                </Button>
+                                <div className="space-y-3">
+                                    <Button onClick={handleStartCourse} size="lg" className="w-full glow-effect">
+                                        {isCompleted ? 'Review Course' : progressPercentage > 0 ? 'Continue Learning' : 'Start Course'}
+                                        <ArrowRight className="w-5 h-5 ml-2" />
+                                    </Button>
+
+                                    {certificateEarned && (
+                                        <Button onClick={handleDownloadCertificate} variant="outline" size="lg" className="w-full border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10">
+                                            <Download className="w-5 h-5 mr-2" />
+                                            Download Certificate
+                                        </Button>
+                                    )}
+
+                                    {isCompleted && !certificateEarned && (
+                                        <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3 text-green-500">
+                                            <Trophy className="w-5 h-5" />
+                                            <span className="font-medium">Course Completed!</span>
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <Button onClick={handleEnroll} size="lg" className="w-full glow-effect">
                                     Enroll Now

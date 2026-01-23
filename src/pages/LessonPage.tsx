@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -29,6 +30,7 @@ const LessonPage = () => {
         lessonId: string;
     }>();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const { startLesson, completeLesson, submitQuiz, getCourseProgress } = useTrainingStore();
 
     const [timeSpent, setTimeSpent] = useState(0);
@@ -75,6 +77,12 @@ const LessonPage = () => {
         if (nextLesson) {
             navigate(`/training-portal/learn/${courseId}/${moduleId}/${nextLesson.id}`);
         } else {
+            // Course Completed
+            toast({
+                title: "Course Completed! 🎉",
+                description: `Congratulations! You have completed ${course.title}.`,
+                duration: 5000,
+            });
             navigate(`/training-portal/course/${courseId}`);
         }
     };
@@ -86,6 +94,12 @@ const LessonPage = () => {
             if (nextLesson) {
                 navigate(`/training-portal/learn/${courseId}/${moduleId}/${nextLesson.id}`);
             } else {
+                // Course Completed
+                toast({
+                    title: "Course Completed! 🎉",
+                    description: `Congratulations! You have completed ${course.title}.`,
+                    duration: 5000,
+                });
                 navigate(`/training-portal/course/${courseId}`);
             }
         }
@@ -158,8 +172,8 @@ const LessonPage = () => {
                                     >
                                         <div
                                             className={`p-3 rounded-lg transition-colors ${isActive
-                                                    ? 'bg-primary/10 border border-primary'
-                                                    : 'hover:bg-secondary/50'
+                                                ? 'bg-primary/10 border border-primary'
+                                                : 'hover:bg-secondary/50'
                                                 }`}
                                         >
                                             <div className="flex items-start gap-3">
