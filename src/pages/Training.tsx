@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Users, Award, Clock, CheckCircle, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, Clock, CheckCircle, Zap, Target, Rocket, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -92,37 +92,107 @@ const Training = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="section-padding hero-gradient">
-        <div className="container-custom">
+      <section className="section-padding hero-gradient relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10" />
+        <div className="container-custom relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20 mb-6 animate-fade-in-up opacity-0">
-              Training Programs
+              Professional Training Programs
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 animate-fade-in-up opacity-0 stagger-1">
-              Launch Your <span className="gradient-text">Tech Career</span>
+              Bridge the Gap Between <br />
+              <span className="gradient-text">Learning and Leading</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up opacity-0 stagger-2 mb-8">
-              Industry-leading training programs designed to transform beginners into
-              professionals and keep experts ahead of the curve.
+            <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up opacity-0 stagger-2 mb-8 max-w-2xl mx-auto">
+              The tech landscape changes daily. Don't get left behind. Master the skills that top companies are hiring for right now.
             </p>
-            <Link to="/training-portal">
-              <Button size="lg" className="glow-effect hover:glow-effect-strong animate-fade-in-up opacity-0 stagger-3">
-                <ArrowRight className="mr-2 w-5 h-5" />
-                Enter Training Portal
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up opacity-0 stagger-3">
+              <Link to="/training-portal">
+                <Button size="lg" className="glow-effect hover:glow-effect-strong">
+                  <ArrowRight className="mr-2 w-5 h-5" />
+                  Enter Training Portal
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-12 bg-card border-y border-border">
+      {/* The Narrative Section */}
+      <section className="section-padding bg-card border-y border-border">
+        <div className="container-custom">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-destructive mb-2">
+                  <Target className="w-6 h-6" />
+                  <h3 className="font-semibold text-lg">The Reality Check</h3>
+                </div>
+                <h2 className="text-3xl font-bold">Theory Isn't Enough Anymore</h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Traditional education and static online courses often fail to prepare you for the chaos of real-world engineering.
+                  Aspiring developers and corporate teams alike struggle because they learn <em>syntax</em>, not <em>systems</em>.
+                </p>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  This gap leaves you feeling unprepared for interviews and overwhelmed on your first day.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-primary mb-2">
+                  <Rocket className="w-6 h-6" />
+                  <h3 className="font-semibold text-lg">The AppforgeX Way</h3>
+                </div>
+                <h2 className="text-3xl font-bold">Learn Like You Work</h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Our training is built by engineers who ship code every day. We don't just teach you how to write a function;
+                  we teach you how to architect a solution, debug a crisis, and deploy with confidence.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-3xl blur-3xl -z-10" />
+              <div className="bg-background border border-border rounded-3xl p-8 shadow-xl">
+                <div className="flex items-start gap-4 mb-6">
+                  <BrainCircuit className="w-12 h-12 text-primary" />
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Your Transformation</h4>
+                    <p className="text-sm text-muted-foreground">From Learner to Leader</p>
+                  </div>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "Stop guessing and start building with best practices.",
+                    "Gain the confidence to tackle complex technical challenges.",
+                    "Build a portfolio that proves you can do the job.",
+                    "Join a community of ambitious professionals."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-8 pt-8 border-t border-border">
+                  <p className="text-lg font-serif italic text-muted-foreground text-center">
+                    "Are you ready to future-proof your career and command the salary you deserve?"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Grid */}
+      <section className="py-16">
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {benefits.map((benefit, index) => (
               <div
                 key={benefit.title}
-                className={`text-center animate-fade-in-up opacity-0 stagger-${index + 1}`}
+                className={`text-center p-4 rounded-xl hover:bg-card transition-colors duration-300`}
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 mx-auto flex items-center justify-center mb-3 text-primary">
                   <benefit.icon className="w-6 h-6" />
@@ -136,11 +206,11 @@ const Training = () => {
       </section>
 
       {/* Programs */}
-      <section className="section-padding" id="programs">
+      <section className="section-padding bg-secondary/20" id="programs">
         <div className="container-custom">
           <SectionHeader
-            badge="All Programs"
-            title="Choose Your Learning Path"
+            badge="Curriculum"
+            title="Choose Your Path to Mastery"
             description="Comprehensive training programs designed for various skill levels and career goals."
             className="mb-16"
           />
@@ -149,7 +219,7 @@ const Training = () => {
             {programs.map((program, index) => (
               <div
                 key={program.title}
-                className={`p-6 rounded-2xl bg-card border border-border card-hover animate-fade-in-up opacity-0 stagger-${(index % 6) + 1}`}
+                className="p-6 rounded-2xl bg-card border border-border card-hover flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
@@ -160,16 +230,16 @@ const Training = () => {
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{program.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">{program.description}</p>
+                <p className="text-muted-foreground text-sm mb-4 flex-grow">{program.description}</p>
                 <ul className="space-y-2 mb-6">
                   {program.topics.map((topic) => (
-                    <li key={topic} className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <li key={topic} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                       {topic}
                     </li>
                   ))}
                 </ul>
-                <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
                   <span className="text-2xl font-bold gradient-text">{program.price}</span>
                   <Link to="/contact">
                     <Button size="sm" className="glow-effect">
