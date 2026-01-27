@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { contactService } from '../services/ContactService.js';
+import { contactService } from '../services/ContactService';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { ApiResponse } from '../types/index.js';
 import { z } from 'zod';
