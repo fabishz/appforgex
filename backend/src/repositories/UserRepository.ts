@@ -75,6 +75,27 @@ export class UserRepository {
     }
 
     /**
+     * Find user by email with password (for authentication)
+     * Used by AuthService for login verification
+     */
+    async findByEmailWithPassword(email: string): Promise<(UserProfile & { password: string }) | null> {
+        const user = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
+
+        if (!user) return null;
+
+        return {
+            ...this.toUserProfile(user),
+            password: user.password,
+        };
+    }
+
+    /**
      * Check if user exists by email
      */
     async existsByEmail(email: string): Promise<boolean> {
