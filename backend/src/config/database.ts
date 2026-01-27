@@ -1,30 +1,84 @@
-import mongoose from 'mongoose';
-import logger from '../middleware/logger.js';
-import { config } from './config.js';
+import { PrismaClient } from '@prisma/client';
+import logger from '../middleware/logger';
 
+/**
+ * Global Prisma Client instance
+ * Using global to prevent multiple instances in development
+ */
+declare global {
+    var prisma: PrismaClient | undefined;
+}
+
+export const prisma =
+    global.prisma ||
+    new PrismaClient({
+        log: [
+            { emit: 'event', level: 'query' },
+            { emit: 'event', level: 'error' },
+            { emit: 'event', level: 'warn' },
+        ],
+    });
+
+if (process.env.NODE_ENV !== 'production') {
+    global.prisma = prisma;
+}
+
+// Log queries in development
+if (process.env.NODE_ENV === 'development') {
+    prisma.$on('query', (e: any) => {
+        logger.debug(`Query: ${e.query}`);
+        logger.debug(`Params: ${e.params}`);
+        logger.debug(`Duration: ${e.duration}ms`);
+    });
+}
+
+// Log errors and warnings
+prisma.$on('error', (e: any) => {
+    logger.error(`Prisma Error: ${e.message}`);
+});
+
+prisma.$on('warn', (e: any) => {
+    logger.warn(`Prisma Warning: ${e.message}`);
+});
+
+/**
+ * Connect to PostgreSQL database via Prisma/Neon
+ */
 export const connectDatabase = async (): Promise<void> => {
     try {
-        await mongoose.connect(config.database.mongoUrl, {
-            maxPoolSize: config.database.maxPoolSize,
-            minPoolSize: config.database.minPoolSize,
-        });
+        logger.info('Connecting to PostgreSQL via Neon Serverless...');
 
-        logger.info('MongoDB connected successfully');
+        // Test the connection
+        await prisma.$queryRaw`SELECT 1`;
+
+        logger.info(
+            '✓ Connected to PostgreSQL (Neon Serverless)'
+        );
+
+        // Graceful shutdown
+        process.on('SIGINT', async () => {
+            logger.info('Closing Prisma connection...');
+            await prisma.$disconnect();
+            process.exit(0);
+        });
     } catch (error) {
-        const err = error instanceof Error ? error : new Error(String(error));
-        logger.error('MongoDB connection failed:', { message: err.message });
+        const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+        logger.error(`✗ PostgreSQL Connection Error: ${errorMessage}`);
         process.exit(1);
     }
 };
 
+/**
+ * Disconnect from PostgreSQL
+ */
 export const disconnectDatabase = async (): Promise<void> => {
     try {
-        await mongoose.disconnect();
-        logger.info('MongoDB disconnected');
+        await prisma.$disconnect();
+        logger.info('✓ Disconnected from PostgreSQL');
     } catch (error) {
-        const err = error instanceof Error ? error : new Error(String(error));
-        logger.error('MongoDB disconnection failed:', {
-            message: err.message,
-        });
+        const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+        logger.error(`✗ PostgreSQL Disconnection Error: ${errorMessage}`);
     }
 };

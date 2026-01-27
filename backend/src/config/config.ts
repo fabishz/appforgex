@@ -8,9 +8,7 @@ export interface Config {
         nodeEnv: 'development' | 'production' | 'test';
     };
     database: {
-        mongoUrl: string;
-        maxPoolSize: number;
-        minPoolSize: number;
+        databaseUrl: string;
     };
     jwt: {
         accessSecret: string;
@@ -39,17 +37,9 @@ const getConfig = (): Config => {
             nodeEnv,
         },
         database: {
-            mongoUrl:
-                process.env.MONGODB_URL ||
-                'mongodb://localhost:27017/training-portal',
-            maxPoolSize: parseInt(
-                process.env.DB_MAX_POOL_SIZE || '10',
-                10
-            ),
-            minPoolSize: parseInt(
-                process.env.DB_MIN_POOL_SIZE || '2',
-                10
-            ),
+            databaseUrl:
+                process.env.DATABASE_URL ||
+                'postgresql://user:password@localhost:5432/training-portal',
         },
         jwt: {
             accessSecret:

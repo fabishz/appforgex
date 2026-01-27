@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String   // Hashed password
+  avatar            String?
+  role              String   @default("student") // "student", "instructor", "admin"
+  skillLevel        String   @default("beginner") // "beginner", "intermediate", "advanced"
+  interests         String[] @default([]) // Array of course categories
+  learningGoals     String[] @default([]) // Array of learning goals
+  enrolledCourses   String[] @default([]) // Array of course IDs
+  completedCourses  String[] @default([]) // Array of course IDs
+  totalLearningTime Int      @default(0) // in minutes
+  currentStreak     Int      @default(0) // days
+  longestStreak     Int      @default(0) // days
+  lastActiveDate    DateTime @default(now())
+  lastLoginDate     DateTime?
+  isActive          Boolean  @default(true)
+
+  // Preferences
+  notificationsEnabled Boolean @default(true)
+  dailyGoalMinutes     Int?
+  preferredLearningTime String? // "morning", "afternoon", "evening"
+
+  // Relationships
+  courseProgress CourseProgress[]
+  achievements   Achievement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([skillLevel])
+}
+
+// Course Model
+model Course {
+  id                   String   @id @default(cuid())
+  title                String
+  shortDescription    String
+  fullDescription     String
+  skillLevel          String   // "beginner", "intermediate", "advanced"
+  category            String   // "web", "mobile", "data-science", etc.
+  thumbnail          String?
+  instructor         String
+  duration           Int      // in minutes
+  rating             Float    @default(0)
+  enrollmentCount    Int      @default(0)
+  certificateOffered Boolean  @default(false)
+  tags               String[] @default([])
+  prerequisites      String[] @default([])
+  learningOutcomes   String[] @default([])
+
+  // Modules (JSON array)
+  modules Json @default("[]")
+
+  // Relationships
+  progress CourseProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([skillLevel])
+  @@index([createdAt])
+  @@fulltext([title, shortDescription])
+}
+
+// Course Progress Model
+model CourseProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  enrolledAt      DateTime @default(now())
+  lastAccessedAt  DateTime @updatedAt
+  completedAt     DateTime?
+  
+  // Progress tracking
+  lessonsCompleted Json     @default("[]") // Array of lesson objects
+  modulesCompleted Json     @default("[]") // Array of module objects
+  quizScores      Json     @default("[]") // Array of quiz scores
+  overallProgress Int      @default(0)    // 0-100
+  totalTimeSpent  Int      @default(0)    // in minutes
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([completedAt])
+}
+
+// Achievement Model
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String
+  icon        String?
+  unlockedAt  DateTime @default(now())
+
+  // Relationship
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([unlockedAt])
+}
+
+// Learning Streak Model
+model LearningStreak {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  currentCount Int      @default(1)
+  longestCount Int      @default(1)
+  lastActiveDate DateTime @default(now())
+  startDate    DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([lastActiveDate])
+}

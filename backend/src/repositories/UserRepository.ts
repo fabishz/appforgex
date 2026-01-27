@@ -1,21 +1,61 @@
-import { User, UserDocument } from '../models/User.js';
-import { UserProfile, NotFoundError } from '../types/index.js';
+import { prisma } from '../config/database';
+import { nanoid } from 'nanoid';
+import {
+    UserProfile,
+    NotFoundError,
+    CourseProgress,
+} from '../types/index';
 
+/**
+ * Prisma-based User Repository
+ * Replaces MongoDB/Mongoose implementation with PostgreSQL/Prisma
+ */
 export class UserRepository {
     /**
      * Create a new user
      */
-    async create(userData: Partial<UserProfile>): Promise<UserProfile> {
-        const user = new User(userData);
-        const savedUser = await user.save();
-        return this.toUserProfile(savedUser);
+    async create(userData: UserProfile): Promise<UserProfile> {
+        const user = await prisma.user.create({
+            data: {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                password: userData.password,
+                avatar: userData.avatar,
+                role: userData.role,
+                skillLevel: userData.skillLevel,
+                interests: userData.interests || [],
+                learningGoals: userData.learningGoals || [],
+                enrolledCourses: userData.enrolledCourses || [],
+                completedCourses: userData.completedCourses || [],
+                totalLearningTime: userData.totalLearningTime || 0,
+                currentStreak: userData.currentStreak || 0,
+                longestStreak: userData.longestStreak || 0,
+                lastActiveDate: userData.lastActiveDate || new Date(),
+                isActive: userData.isActive !== false,
+                notificationsEnabled:
+                    userData.preferences?.notificationsEnabled !== false,
+                dailyGoalMinutes: userData.preferences?.dailyGoalMinutes,
+                preferredLearningTime:
+                    userData.preferences?.preferredLearningTime,
+            },
+        });
+
+        return this.toUserProfile(user);
     }
 
     /**
      * Find user by ID
      */
     async findById(userId: string): Promise<UserProfile | null> {
-        const user = await User.findOne({ id: userId });
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
+
         return user ? this.toUserProfile(user) : null;
     }
 
@@ -23,20 +63,26 @@ export class UserRepository {
      * Find user by email
      */
     async findByEmail(email: string): Promise<UserProfile | null> {
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const user = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
+
         return user ? this.toUserProfile(user) : null;
     }
 
     /**
-     * Get user with password hash (for authentication)
+     * Check if user exists by email
      */
-    async findByEmailWithPassword(
-        email: string
-    ): Promise<(UserProfile & { password: string }) | null> {
-        const user = await User.findOne({
-            email: email.toLowerCase(),
-        }).select('+password');
-        return user ? this.toUserProfileWithPassword(user) : null;
+    async existsByEmail(email: string): Promise<boolean> {
+        const user = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() },
+        });
+
+        return !!user;
     }
 
     /**
@@ -44,111 +90,157 @@ export class UserRepository {
      */
     async update(
         userId: string,
-        updateData: Partial<UserProfile>
+        updates: Partial<UserProfile>
     ): Promise<UserProfile> {
-        const user = await User.findOneAndUpdate(
-            { id: userId },
-            { ...updateData, updatedAt: new Date() },
-            { new: true }
-        );
-
-        if (!user) {
-            throw new NotFoundError('User', userId);
-        }
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...(updates.name && { name: updates.name }),
+                ...(updates.avatar && { avatar: updates.avatar }),
+                ...(updates.skillLevel && { skillLevel: updates.skillLevel }),
+                ...(updates.interests && { interests: updates.interests }),
+                ...(updates.learningGoals && {
+                    learningGoals: updates.learningGoals,
+                }),
+                ...(updates.enrolledCourses && {
+                    enrolledCourses: updates.enrolledCourses,
+                }),
+                ...(updates.completedCourses && {
+                    completedCourses: updates.completedCourses,
+                }),
+                ...(updates.totalLearningTime !== undefined && {
+                    totalLearningTime: updates.totalLearningTime,
+                }),
+                ...(updates.lastActiveDate && {
+                    lastActiveDate: updates.lastActiveDate,
+                }),
+                ...(updates.isActive !== undefined && {
+                    isActive: updates.isActive,
+                }),
+            },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
 
         return this.toUserProfile(user);
     }
 
     /**
-     * Update user progress
+     * Update course progress
      */
     async updateProgress(
         userId: string,
         courseId: string,
-        progressUpdate: any
+        progressUpdate: Partial<CourseProgress>
     ): Promise<UserProfile> {
-        const user = await User.findOne({ id: userId });
-        if (!user) {
-            throw new NotFoundError('User', userId);
-        }
+        const existing = await prisma.courseProgress.findUnique({
+            where: {
+                userId_courseId: { userId, courseId },
+            },
+        });
 
-        const courseProgressIndex = user.courseProgress.findIndex(
-            (p: any) => p.courseId === courseId
-        );
-
-        if (courseProgressIndex >= 0) {
-            user.courseProgress[courseProgressIndex] = {
-                ...user.courseProgress[courseProgressIndex],
-                ...progressUpdate,
-                lastAccessedAt: new Date(),
-            };
+        if (existing) {
+            await prisma.courseProgress.update({
+                where: {
+                    userId_courseId: { userId, courseId },
+                },
+                data: {
+                    lessonsCompleted: progressUpdate.lessonsCompleted || existing.lessonsCompleted,
+                    modulesCompleted: progressUpdate.modulesCompleted || existing.modulesCompleted,
+                    quizScores: progressUpdate.quizScores || existing.quizScores,
+                    overallProgress: progressUpdate.overallProgress || existing.overallProgress,
+                    totalTimeSpent:
+                        progressUpdate.totalTimeSpent ||
+                        existing.totalTimeSpent,
+                    lastAccessedAt: new Date(),
+                },
+            });
         } else {
-            user.courseProgress.push({
-                courseId,
-                enrolledAt: new Date(),
-                lastAccessedAt: new Date(),
-                ...progressUpdate,
+            await prisma.courseProgress.create({
+                data: {
+                    id: nanoid(),
+                    userId,
+                    courseId,
+                    enrolledAt: new Date(),
+                    lastAccessedAt: new Date(),
+                    lessonsCompleted: progressUpdate.lessonsCompleted || [],
+                    modulesCompleted: progressUpdate.modulesCompleted || [],
+                    quizScores: progressUpdate.quizScores || [],
+                    overallProgress: progressUpdate.overallProgress || 0,
+                    totalTimeSpent: progressUpdate.totalTimeSpent || 0,
+                },
             });
         }
 
-        await user.save();
-        return this.toUserProfile(user);
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
+
+        return user ? this.toUserProfile(user) : ({} as UserProfile);
     }
 
     /**
      * Enroll user in course
      */
     async enrollCourse(userId: string, courseId: string): Promise<UserProfile> {
-        const user = await User.findOne({ id: userId });
-        if (!user) {
-            throw new NotFoundError('User', userId);
-        }
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                enrolledCourses: {
+                    push: courseId,
+                },
+            },
+        });
 
-        if (!user.enrolledCourses.includes(courseId)) {
-            user.enrolledCourses.push(courseId);
-            user.courseProgress.push({
-                courseId,
-                enrolledAt: new Date(),
-                lastAccessedAt: new Date(),
-                moduleProgress: [],
-                overallProgress: 0,
-                certificateEarned: false,
-            });
-        }
+        // Create course progress record
+        await this.updateProgress(userId, courseId, {
+            enrolledAt: new Date(),
+        } as any);
 
-        user.updatedAt = new Date();
-        await user.save();
-        return this.toUserProfile(user);
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
+
+        return user ? this.toUserProfile(user) : ({} as UserProfile);
     }
 
     /**
      * Delete user
      */
     async delete(userId: string): Promise<void> {
-        const result = await User.deleteOne({ id: userId });
-        if (result.deletedCount === 0) {
-            throw new NotFoundError('User', userId);
-        }
+        await prisma.user.delete({
+            where: { id: userId },
+        });
     }
 
     /**
      * List users with pagination
      */
-    async list(
-        page: number = 1,
-        limit: number = 10
-    ): Promise<{
+    async list(skip: number = 0, limit: number = 10): Promise<{
         users: UserProfile[];
         total: number;
         hasMore: boolean;
     }> {
-        const skip = (page - 1) * limit;
-        const users = await User.find()
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
+        const users = await prisma.user.findMany({
+            skip,
+            take: limit,
+            include: {
+                courseProgress: true,
+                achievements: true,
+            },
+        });
 
-        const total = await User.countDocuments();
+        const total = await prisma.user.count();
 
         return {
             users: users.map((u: any) => this.toUserProfile(u)),
@@ -158,27 +250,37 @@ export class UserRepository {
     }
 
     /**
-     * Convert UserDocument to UserProfile (remove password)
+     * Convert database user to UserProfile
      */
-    private toUserProfile(user: UserDocument): UserProfile {
-        const obj = (user.toObject?.() || user) as any;
+    private toUserProfile(user: any): UserProfile {
         return {
-            ...obj,
-            password: '', // Never expose password
-        } as UserProfile;
-    }
-
-    /**
-     * Convert UserDocument to UserProfile with password (for auth only)
-     */
-    private toUserProfileWithPassword(
-        user: UserDocument
-    ): UserProfile & { password: string } {
-        const obj = (user.toObject?.() || user) as any;
-        return {
-            ...obj,
-            password: obj.password,
-        } as UserProfile & { password: string };
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            password: user.password,
+            avatar: user.avatar,
+            role: user.role,
+            skillLevel: user.skillLevel,
+            interests: user.interests || [],
+            learningGoals: user.learningGoals || [],
+            enrolledCourses: user.enrolledCourses || [],
+            completedCourses: user.completedCourses || [],
+            courseProgress: user.courseProgress || [],
+            achievements: user.achievements || [],
+            totalLearningTime: user.totalLearningTime || 0,
+            currentStreak: user.currentStreak || 0,
+            longestStreak: user.longestStreak || 0,
+            lastActiveDate: user.lastActiveDate,
+            lastLoginDate: user.lastLoginDate,
+            isActive: user.isActive,
+            preferences: {
+                notificationsEnabled: user.notificationsEnabled,
+                dailyGoalMinutes: user.dailyGoalMinutes,
+                preferredLearningTime: user.preferredLearningTime,
+            },
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
     }
 }
 
