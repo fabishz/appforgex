@@ -133,7 +133,7 @@ export class UserRepository {
     async updateProgress(
         userId: string,
         courseId: string,
-        progressUpdate: Partial<CourseProgress>
+        progressUpdate: any
     ): Promise<UserProfile> {
         const existing = await prisma.courseProgress.findUnique({
             where: {
