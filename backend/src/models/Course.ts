@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { Course } from '../../types/index.js';
+import type { Course } from '../types/index';
 
-export interface CourseDocument extends Course, Document {}
+// omit _id and id since Document already provides them
+export interface CourseDocument extends Omit<Course, '_id' | 'id'>, Document {}
 
 const CourseSchema = new Schema<CourseDocument>(
     {
@@ -94,7 +95,7 @@ const CourseSchema = new Schema<CourseDocument>(
 CourseSchema.index({ category: 1, skillLevel: 1 });
 CourseSchema.index({ title: 'text', shortDescription: 'text' });
 
-CourseSchema.pre('save', function (next: (err?: Error) => void) {
+CourseSchema.pre<CourseDocument>('save', function (next: (err?: Error) => void) {
     this.updatedAt = new Date();
     next();
 });

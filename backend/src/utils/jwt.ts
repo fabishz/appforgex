@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JwtPayload, AuthTokens } from '../types/index.js';
+import type { JwtPayload, AuthTokens } from '../types/index';
 
 const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || 'your-secret-key';
 const REFRESH_TOKEN_SECRET =
@@ -12,25 +12,19 @@ export const jwtUtils = {
      * Generate both access and refresh tokens
      */
     generateTokens(userId: string, email: string, role: string): AuthTokens {
-        const accessToken = jwt.sign(
-            {
-                userId,
-                email,
-                role,
-            },
-            ACCESS_TOKEN_SECRET,
-            { expiresIn: ACCESS_TOKEN_EXPIRY }
-        );
+        const payload = {
+            userId,
+            email,
+            role,
+        };
+        
+        const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET as string, {
+            expiresIn: ACCESS_TOKEN_EXPIRY,
+        } as any);
 
-        const refreshToken = jwt.sign(
-            {
-                userId,
-                email,
-                role,
-            },
-            REFRESH_TOKEN_SECRET,
-            { expiresIn: REFRESH_TOKEN_EXPIRY }
-        );
+        const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET as string, {
+            expiresIn: REFRESH_TOKEN_EXPIRY,
+        } as any);
 
         const decoded = jwt.decode(accessToken) as any;
         const expiresIn =

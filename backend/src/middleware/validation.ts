@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import sanitizeHtml from 'sanitize-html';
-import { ValidationError } from '../types/index.js';
+import { ValidationError } from '../types/index';
 
 /**
  * Sanitize request body to prevent XSS attacks
@@ -34,12 +34,12 @@ function sanitizeObject<T extends Record<string, any>>(obj: T): T {
             } else if (
                 value &&
                 typeof value === 'object' &&
-                !(value instanceof Date) &&
-                !Array.isArray(value)
+                !Array.isArray(value) &&
+                Object.prototype.toString.call(value) !== '[object Date]'
             ) {
                 sanitized[key] = sanitizeObject(value);
             } else if (Array.isArray(value)) {
-                sanitized[key] = value.map((item) =>
+                sanitized[key] = value.map((item: any) =>
                     typeof item === 'string'
                         ? sanitizeHtml(item, {
                               allowedTags: [],
@@ -60,7 +60,7 @@ function sanitizeObject<T extends Record<string, any>>(obj: T): T {
  * Validate request input against schema
  */
 export const validateInput = (schema: Record<string, any>) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
         const errors: Record<string, string> = {};
 
         for (const [key, validator] of Object.entries(schema)) {
@@ -104,7 +104,7 @@ export const validateInput = (schema: Record<string, any>) => {
         }
 
         if (Object.keys(errors).length > 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 error: {
                     code: 'VALIDATION_ERROR',
@@ -112,6 +112,7 @@ export const validateInput = (schema: Record<string, any>) => {
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         next();

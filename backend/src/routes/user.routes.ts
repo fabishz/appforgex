@@ -56,12 +56,12 @@ router.get(
 router.put(
     '/:userId',
     requireAuth,
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const authReq = req as AuthRequest;
         
         // Ensure user can only update their own profile
         if (authReq.userId !== req.params.userId) {
-            return res.status(403).json({
+            res.status(403).json({
                 success: false,
                 error: {
                     code: 'AUTHORIZATION_ERROR',
@@ -69,6 +69,7 @@ router.put(
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         const user = await userRepository.update(req.params.userId, req.body);
@@ -91,12 +92,12 @@ router.put(
 router.post(
     '/:userId/progress/:courseId/:moduleId/:lessonId',
     requireAuth,
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const authReq = req as AuthRequest;
         
         // Ensure user can only update their own progress
         if (authReq.userId !== req.params.userId) {
-            return res.status(403).json({
+            res.status(403).json({
                 success: false,
                 error: {
                     code: 'AUTHORIZATION_ERROR',
@@ -104,6 +105,7 @@ router.post(
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         await progressService.updateLessonProgress(
@@ -131,11 +133,11 @@ router.post(
 router.post(
     '/:userId/streak',
     requireAuth,
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const authReq = req as AuthRequest;
         
         if (authReq.userId !== req.params.userId) {
-            return res.status(403).json({
+            res.status(403).json({
                 success: false,
                 error: {
                     code: 'AUTHORIZATION_ERROR',
@@ -143,6 +145,7 @@ router.post(
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         await progressService.updateStreak(req.params.userId);

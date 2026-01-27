@@ -5,18 +5,18 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
-import { config } from './config/config.js';
-import { connectDatabase } from './config/database.js';
-import logger from './middleware/logger.js';
-import { sanitizeMiddleware } from './middleware/validation.js';
+import { config } from './config/config';
+import { connectDatabase } from './config/database';
+import logger from './middleware/logger';
+import { sanitizeMiddleware } from './middleware/validation';
 import {
     errorHandler,
     notFoundHandler,
-} from './middleware/errorHandler.js';
+} from './middleware/errorHandler';
 
-import authRoutes from './routes/auth.routes.js';
-import courseRoutes from './routes/courses.routes.js';
-import userRoutes from './routes/user.routes.js';
+import authRoutes from './routes/auth.routes';
+import courseRoutes from './routes/courses.routes';
+import userRoutes from './routes/user.routes';
 
 dotenv.config();
 

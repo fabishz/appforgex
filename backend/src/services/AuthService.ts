@@ -58,6 +58,8 @@ export class AuthService {
             password: passwordHash,
             skillLevel: request.skillLevel || 'beginner',
             role: 'student',
+            interests: [],
+            learningGoals: [],
             enrolledCourses: [],
             completedCourses: [],
             courseProgress: [],

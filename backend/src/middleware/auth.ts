@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { jwtUtils } from './jwt.js';
-import { AuthenticationError, AuthorizationError } from '../types/index.js';
+import { jwtUtils } from '../utils/jwt';
+import { AuthenticationError, AuthorizationError } from '../types/index';
 
 export interface AuthRequest extends Request {
     userId?: string;
@@ -15,7 +15,7 @@ export const authMiddleware = (
     req: AuthRequest,
     res: Response,
     next: NextFunction
-) => {
+): void => {
     try {
         const authHeader = req.headers.authorization;
         const token = jwtUtils.extractToken(authHeader);
@@ -35,7 +35,7 @@ export const authMiddleware = (
         next();
     } catch (error) {
         if (error instanceof AuthenticationError) {
-            return res.status(error.statusCode).json({
+            res.status(error.statusCode).json({
                 success: false,
                 error: {
                     code: error.code,
@@ -43,6 +43,7 @@ export const authMiddleware = (
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         const err =
@@ -54,7 +55,7 @@ export const authMiddleware = (
             err.message.includes('jwt expired') ||
             err.message.includes('JsonWebTokenError')
         ) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 error: {
                     code: 'TOKEN_EXPIRED',
@@ -62,9 +63,10 @@ export const authMiddleware = (
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             error: {
                 code: 'INVALID_TOKEN',
@@ -79,9 +81,9 @@ export const authMiddleware = (
  * Verify user has required role
  */
 export const requireRole = (...roles: string[]) => {
-    return (req: AuthRequest, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction): void => {
         if (!req.userRole) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 error: {
                     code: 'AUTHENTICATION_ERROR',
@@ -89,10 +91,11 @@ export const requireRole = (...roles: string[]) => {
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         if (!roles.includes(req.userRole)) {
-            return res.status(403).json({
+            res.status(403).json({
                 success: false,
                 error: {
                     code: 'AUTHORIZATION_ERROR',
@@ -100,6 +103,7 @@ export const requireRole = (...roles: string[]) => {
                 },
                 timestamp: new Date(),
             });
+            return;
         }
 
         next();

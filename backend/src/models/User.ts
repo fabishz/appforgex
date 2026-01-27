@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { UserProfile } from '../../types/index.js';
+import type { UserProfile } from '../types/index';
 
-export interface UserDocument extends UserProfile, Document {}
+// omit _id and id since Document already provides them
+export interface UserDocument extends Omit<UserProfile, '_id' | 'id'>, Document {}
 
 const UserSchema = new Schema<UserDocument>(
     {
@@ -130,7 +131,7 @@ UserSchema.index({ createdAt: -1 });
 UserSchema.index({ enrolledCourses: 1 });
 
 // Update updatedAt on save
-UserSchema.pre('save', function (next) {
+UserSchema.pre<UserDocument>('save', function (next) {
     this.updatedAt = new Date();
     next();
 });

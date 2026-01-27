@@ -57,28 +57,28 @@ export class CourseRepository {
         switch (filters?.sortBy) {
             case 'popular':
                 courses.sort(
-                    (a, b) =>
+                    (a: any, b: any) =>
                         (b.enrollmentCount || 0) - (a.enrollmentCount || 0)
                 );
                 break;
             case 'rating':
-                courses.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                courses.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
                 break;
             case 'recent':
                 courses.sort(
-                    (a, b) =>
+                    (a: any, b: any) =>
                         new Date(b.createdAt).getTime() -
                         new Date(a.createdAt).getTime()
                 );
                 break;
             case 'duration':
-                courses.sort((a, b) => a.duration - b.duration);
+                courses.sort((a: any, b: any) => a.duration - b.duration);
                 break;
             default:
                 break;
         }
 
-        return courses.map((c) => this.toDTO(c));
+        return courses.map((c: any) => this.toDTO(c));
     }
 
     /**
@@ -86,7 +86,7 @@ export class CourseRepository {
      */
     async findByIds(courseIds: string[]): Promise<Course[]> {
         const courses = await CourseModel.find({ id: { $in: courseIds } });
-        return courses.map((c) => this.toDTO(c));
+        return courses.map((c: any) => this.toDTO(c));
     }
 
     /**
@@ -169,25 +169,26 @@ export class CourseRepository {
      * Convert CourseDocument to Course DTO
      */
     private toDTO(course: CourseDocument): Course {
+        const doc = course.toObject?.() || (course as any);
         return {
-            id: course.id,
-            title: course.title,
-            shortDescription: course.shortDescription,
-            fullDescription: course.fullDescription,
-            skillLevel: course.skillLevel,
-            category: course.category,
-            thumbnail: course.thumbnail,
-            instructor: course.instructor,
-            modules: course.modules,
-            prerequisites: course.prerequisites,
-            learningOutcomes: course.learningOutcomes,
-            duration: course.duration,
-            rating: course.rating,
-            enrollmentCount: course.enrollmentCount,
-            certificateOffered: course.certificateOffered,
-            tags: course.tags,
-            createdAt: course.createdAt,
-            updatedAt: course.updatedAt,
+            id: doc.id,
+            title: doc.title,
+            shortDescription: doc.shortDescription,
+            fullDescription: doc.fullDescription,
+            skillLevel: doc.skillLevel,
+            category: doc.category,
+            thumbnail: doc.thumbnail,
+            instructor: doc.instructor,
+            modules: doc.modules,
+            prerequisites: doc.prerequisites,
+            learningOutcomes: doc.learningOutcomes,
+            duration: doc.duration,
+            rating: doc.rating,
+            enrollmentCount: doc.enrollmentCount,
+            certificateOffered: doc.certificateOffered,
+            tags: doc.tags,
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
         };
     }
 }

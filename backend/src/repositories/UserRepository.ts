@@ -73,7 +73,7 @@ export class UserRepository {
         }
 
         const courseProgressIndex = user.courseProgress.findIndex(
-            (p) => p.courseId === courseId
+            (p: any) => p.courseId === courseId
         );
 
         if (courseProgressIndex >= 0) {
@@ -151,7 +151,7 @@ export class UserRepository {
         const total = await User.countDocuments();
 
         return {
-            users: users.map((u) => this.toUserProfile(u)),
+            users: users.map((u: any) => this.toUserProfile(u)),
             total,
             hasMore: skip + limit < total,
         };
@@ -161,7 +161,7 @@ export class UserRepository {
      * Convert UserDocument to UserProfile (remove password)
      */
     private toUserProfile(user: UserDocument): UserProfile {
-        const obj = user.toObject();
+        const obj = (user.toObject?.() || user) as any;
         return {
             ...obj,
             password: '', // Never expose password
@@ -174,10 +174,10 @@ export class UserRepository {
     private toUserProfileWithPassword(
         user: UserDocument
     ): UserProfile & { password: string } {
-        const obj = user.toObject();
+        const obj = (user.toObject?.() || user) as any;
         return {
             ...obj,
-            password: user.password,
+            password: obj.password,
         } as UserProfile & { password: string };
     }
 }
