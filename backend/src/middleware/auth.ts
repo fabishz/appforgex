@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { jwtUtils } from '../utils/jwt';
-import { AuthenticationError, AuthorizationError } from '../types/index';
+import { jwtUtils } from '../utils/jwt.js';
+import { AuthenticationError, AuthorizationError } from '../types/index.js';
 
 export interface AuthRequest extends Request {
     userId?: string;

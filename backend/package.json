@@ -7,7 +7,7 @@
     "scripts": {
         "start": "node dist/server.js",
         "dev": "nodemon --exec 'node --experimental-specifier-resolution=node' dist/server.js",
-        "dev:ts": "nodemon --exec ts-node src/server.ts",
+        "dev:ts": "nodemon --exec 'node --loader ts-node/esm --no-warnings=ExperimentalWarning' src/server.ts",
         "build": "tsc",
         "lint": "eslint src --ext .ts",
         "format": "prettier --write src",

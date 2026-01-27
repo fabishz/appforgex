@@ -15,8 +15,37 @@ export class CourseService {
         filters?: CourseFilters,
         page: number = 1,
         limit: number = 10
-    ) {
-        return courseRepository.list(page, limit, filters);
+    ): Promise<{ courses: Course[]; total: number; hasMore: boolean }> {
+        const skip = (page - 1) * limit;
+        
+        if (filters) {
+            // Use findAll for filtered queries
+            const skillLevel = Array.isArray(filters.skillLevel) 
+                ? filters.skillLevel[0] 
+                : filters.skillLevel;
+            
+            const duration = filters.duration 
+                ? typeof filters.duration === 'object' 
+                    ? filters.duration.max 
+                    : filters.duration
+                : undefined;
+
+            const courses = await courseRepository.findAll({
+                category: filters.category as any,
+                skillLevel: skillLevel,
+                searchQuery: filters.searchQuery,
+                duration: duration,
+                sortBy: filters.sortBy as any,
+            });
+            
+            return {
+                courses,
+                total: courses.length,
+                hasMore: false,
+            };
+        }
+        
+        return courseRepository.list(skip, limit);
     }
 
     /**
@@ -155,7 +184,7 @@ export class CourseService {
      */
     async getCoursesByCategory(category: string): Promise<Course[]> {
         return courseRepository.findAll({
-            category: [category as any],
+            category: category,
         });
     }
 
@@ -173,7 +202,7 @@ export class CourseService {
         await userRepository.enrollCourse(userId, courseId);
 
         // Increment enrollment count
-        await courseRepository.incrementEnrollmentCount(courseId);
+        await courseRepository.incrementEnrollment(courseId);
     }
 }
 

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import sanitizeHtml from 'sanitize-html';
-import { ValidationError } from '../types/index';
+import { ValidationError } from '../types/index.js';
 
 /**
  * Sanitize request body to prevent XSS attacks

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import logger from '../middleware/logger';
+import logger from '../middleware/logger.js';
 
 /**
  * Global Prisma Client instance
@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Log queries in development
 if (process.env.NODE_ENV === 'development') {
-    prisma.$on('query', (e: any) => {
+    (prisma as any).$on('query', (e: any) => {
         logger.debug(`Query: ${e.query}`);
         logger.debug(`Params: ${e.params}`);
         logger.debug(`Duration: ${e.duration}ms`);
@@ -33,11 +33,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Log errors and warnings
-prisma.$on('error', (e: any) => {
+(prisma as any).$on('error', (e: any) => {
     logger.error(`Prisma Error: ${e.message}`);
 });
 
-prisma.$on('warn', (e: any) => {
+(prisma as any).$on('warn', (e: any) => {
     logger.warn(`Prisma Warning: ${e.message}`);
 });
 

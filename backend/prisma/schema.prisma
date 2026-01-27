@@ -56,7 +56,7 @@ model Course {
   skillLevel          String   // "beginner", "intermediate", "advanced"
   category            String   // "web", "mobile", "data-science", etc.
   thumbnail          String?
-  instructor         String
+  instructor         Json     // {name, title, avatar}
   duration           Int      // in minutes
   rating             Float    @default(0)
   enrollmentCount    Int      @default(0)
@@ -77,7 +77,7 @@ model Course {
   @@index([category])
   @@index([skillLevel])
   @@index([createdAt])
-  @@fulltext([title, shortDescription])
+  @@index([title]) // For text search
 }
 
 // Course Progress Model
@@ -142,4 +142,23 @@ model LearningStreak {
 
   @@index([userId])
   @@index([lastActiveDate])
+}
+
+// Contact Form Submission Model
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  company   String   @default("")
+  subject   String
+  message   String   @db.Text
+  status    String   @default("new") // "new", "read", "responded"
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([status])
 }

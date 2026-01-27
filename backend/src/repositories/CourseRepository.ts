@@ -1,6 +1,6 @@
-import { prisma } from '../config/database';
+import { prisma } from '../config/database.js';
 import { nanoid } from 'nanoid';
-import { Course, NotFoundError } from '../types/index';
+import { Course, NotFoundError } from '../types/index.js';
 
 /**
  * Prisma-based Course Repository
@@ -20,7 +20,7 @@ export class CourseRepository {
                 skillLevel: courseData.skillLevel,
                 category: courseData.category,
                 thumbnail: courseData.thumbnail,
-                instructor: courseData.instructor,
+                instructor: courseData.instructor as any,
                 duration: courseData.duration,
                 rating: courseData.rating || 0,
                 enrollmentCount: courseData.enrollmentCount || 0,
@@ -28,7 +28,7 @@ export class CourseRepository {
                 tags: courseData.tags || [],
                 prerequisites: courseData.prerequisites || [],
                 learningOutcomes: courseData.learningOutcomes || [],
-                modules: courseData.modules,
+                modules: courseData.modules as any,
             },
         });
 

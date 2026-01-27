@@ -1,10 +1,10 @@
-import { prisma } from '../config/database';
+import { prisma } from '../config/database.js';
 import { nanoid } from 'nanoid';
 import {
     UserProfile,
     NotFoundError,
     CourseProgress,
-} from '../types/index';
+} from '../types/index.js';
 
 /**
  * Prisma-based User Repository

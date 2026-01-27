@@ -8,6 +8,7 @@ import { Layout } from '@/components/layout/Layout';
 import { SectionHeader } from '@/components/ui/section-header';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { apiCall, API_ENDPOINTS } from '@/utils/api';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -48,14 +49,33 @@ const Contact = () => {
     try {
       const validatedData = contactSchema.parse(formData);
       
-      // Simulate form submission
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+      // Send to backend API
+      const response = await apiCall(API_ENDPOINTS.CONTACT_SUBMIT, {
+        method: 'POST',
+        body: JSON.stringify(validatedData),
+      });
+
+      if (!response.success) {
+        // Handle validation errors
+        if (response.error?.code === 'VALIDATION_ERROR' && response.error?.details) {
+          const fieldErrors = JSON.parse(response.error.details);
+          setErrors(fieldErrors);
+        }
+        
+        toast({
+          title: 'Error',
+          description: response.error?.details || 'Failed to submit form',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       toast({
         title: 'Message sent successfully!',
         description: "We'll get back to you within 24 hours.",
       });
       
+      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -74,6 +94,18 @@ const Contact = () => {
           }
         });
         setErrors(fieldErrors);
+        toast({
+          title: 'Validation Error',
+          description: 'Please fix the errors in the form.',
+          variant: 'destructive',
+        });
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsSubmitting(false);

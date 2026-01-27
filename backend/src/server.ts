@@ -5,18 +5,19 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
-import { config } from './config/config';
-import { connectDatabase } from './config/database';
-import logger from './middleware/logger';
-import { sanitizeMiddleware } from './middleware/validation';
+import { config } from './config/config.js';
+import { connectDatabase } from './config/database.js';
+import logger from './middleware/logger.js';
+import { sanitizeMiddleware } from './middleware/validation.js';
 import {
     errorHandler,
     notFoundHandler,
-} from './middleware/errorHandler';
+} from './middleware/errorHandler.js';
 
-import authRoutes from './routes/auth.routes';
-import courseRoutes from './routes/courses.routes';
-import userRoutes from './routes/user.routes';
+import authRoutes from './routes/auth.routes.js';
+import courseRoutes from './routes/courses.routes.js';
+import userRoutes from './routes/user.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 
 dotenv.config();
 
@@ -85,6 +86,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 // ============ Error Handling ============
 
