@@ -177,7 +177,7 @@ export class CourseRepository {
         const total = await prisma.course.count();
 
         return {
-            courses: courses.map((c) => this.toDTO(c)),
+            courses: courses.map((c: any) => this.toDTO(c)),
             total,
             hasMore: skip + limit < total,
         };
