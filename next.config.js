@@ -1,19 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   typescript: {
     tsconfigPath: './tsconfig.json',
   },
-  eslint: {
-    dirs: ['app', 'lib', 'utils'],
-  },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals.push('_http_common');
-    }
-    return config;
-  },
+  // Remove custom webpack config to avoid Turbopack conflicts.
+  // If you need custom bundler behavior in the future, prefer configuring
+  // `turbopack` or run the build with `--webpack`.
+  turbopack: {},
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
   },

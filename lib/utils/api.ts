@@ -3,30 +3,23 @@
  * Centralized API endpoint configuration
  */
 
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = typeof window !== 'undefined' 
+  ? process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000'
+  : process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 export const API_ENDPOINTS = {
   // Contact
-  CONTACT_SUBMIT: `${API_BASE_URL}/api/contact/submit`,
-  CONTACT_GET: (id: string) => `${API_BASE_URL}/api/contact/${id}`,
-  CONTACT_LIST: `${API_BASE_URL}/api/contact`,
+  CONTACT_SUBMIT: '/api/contact',
+  CONTACT_LIST: '/api/contact',
+  CONTACT_GET: (id: string) => `/api/contact/${id}`,
   
   // Auth
-  AUTH_REGISTER: `${API_BASE_URL}/api/auth/register`,
-  AUTH_LOGIN: `${API_BASE_URL}/api/auth/login`,
-  AUTH_LOGOUT: `${API_BASE_URL}/api/auth/logout`,
-  AUTH_REFRESH: `${API_BASE_URL}/api/auth/refresh`,
+  AUTH_REGISTER: '/api/auth/register',
+  AUTH_LOGIN: '/api/auth/login',
   
   // Courses
-  COURSES_LIST: `${API_BASE_URL}/api/courses`,
-  COURSES_GET: (id: string) => `${API_BASE_URL}/api/courses/${id}`,
-  COURSES_ENROLL: (id: string) => `${API_BASE_URL}/api/courses/${id}/enroll`,
-  COURSES_RECOMMENDATIONS: (userId: string) => `${API_BASE_URL}/api/courses/recommendations/${userId}`,
-  
-  // Users
-  USERS_PROFILE: `${API_BASE_URL}/api/users/profile`,
-  USERS_GET: (id: string) => `${API_BASE_URL}/api/users/${id}`,
-  USERS_UPDATE: `${API_BASE_URL}/api/users/profile`,
+  COURSES_LIST: '/api/courses',
+  COURSES_GET: (id: string) => `/api/courses/${id}`,
 };
 
 export interface ApiResponse<T = any> {

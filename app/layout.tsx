@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
-import '@/src/index.css';
+import './index.css';
 
 export const metadata = {
   title: 'AppForGex Digital Showcase',
